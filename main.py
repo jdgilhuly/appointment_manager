@@ -12,9 +12,11 @@ from vocode.streaming.telephony.server.base import (
     TwilioInboundCallConfig,
     TelephonyServer,
 )
+from vocode.streaming.models.transcriber import DeepgramTranscriberConfig, PunctuationEndpointingConfig
 
 from speller_agent import SpellerAgentFactory
 import sys
+from event_manager import CustomEventsManager
 
 
 
@@ -51,14 +53,18 @@ def read_prompt_from_file(file_path):
     with open(file_path, "r") as f:
         return f.read()
 
-print (os.getcwd())
 prompts_file_path = os.path.join(os.path.dirname(__file__), 'prompts', 'prompt.txt')
 prompt = read_prompt_from_file(prompts_file_path)
+
+logger.info('TFFF')
+logger.info(os.environ["TWILIO_ACCOUNT_SID"])
+logger.info(os.environ["TWILIO_AUTH_TOKEN"])
 
 #EndpointingConfig.time_cutoff_seconds = 10
 telephony_server = TelephonyServer(
     base_url=BASE_URL,
     config_manager=config_manager,
+    event_manager=CustomEventsManager(),
     inbound_call_configs=[
         TwilioInboundCallConfig(
             url="/inbound_call",
@@ -74,6 +80,10 @@ telephony_server = TelephonyServer(
             twilio_config=TwilioConfig(
                 account_sid=os.environ["TWILIO_ACCOUNT_SID"],
                 auth_token=os.environ["TWILIO_AUTH_TOKEN"],
+                record=True
+            ),
+            transcriber_config=DeepgramTranscriberConfig.from_telephone_input_device(
+                endpointing_config=PunctuationEndpointingConfig()
             ),
         )
     ],
