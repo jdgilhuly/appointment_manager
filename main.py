@@ -63,8 +63,8 @@ telephony_server = TelephonyServer(
                 prompt_preamble=pre_prompt,
                 temperature=.05,
                 end_conversation_on_goodbye=True,
-                generate_response=False,
-                allowed_idle_time_seconds=30,
+                generate_response=True,
+                allowed_idle_time_seconds=40,
                 allow_agent_to_be_cut_off=False,
                 model_name='text-davinci-003'
             ),

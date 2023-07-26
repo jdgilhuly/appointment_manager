@@ -1,6 +1,5 @@
 import logging
 import re
-import openai
 from typing import Optional, AsyncGenerator
 import typing
 from vocode.streaming.agent import LLMAgent
@@ -43,8 +42,8 @@ class CustomAgent(LLMAgent):
                 return True
 
             for sentence in self.memory:
-                full_phrase = "your {} is confirmed".format(phrase)
-                if full_phrase in sentence:
+                full_phrase = "your {} is confirmed".format(phrase).lower()
+                if full_phrase in sentence.lower():
                     self.patient_info[phrase]=True
                     return True
 
@@ -55,6 +54,7 @@ class CustomAgent(LLMAgent):
             self.memory.append(self.get_memory_entry(human_input, cut_off_response))
             yield cut_off_response
             return
+
         self.memory.append(self.get_memory_entry(human_input, ""))
         if self.is_first_response and self.first_response:
             self.logger.debug("First response is cached")
@@ -65,7 +65,7 @@ class CustomAgent(LLMAgent):
                 human_input += "Ask for my name, repeating it back to me as a question to see if it is correct. Prepare but don't yet ask for my date of birth"
 
             elif not search_memory('date of birth'):
-                human_input += "Ask for my date of birth, repeating it back to me as a question to see if it is correct. Prepare but don't yet ask for my insurance payer name."
+                human_input += "Ask for my full date of birth, repeating it back to me as a question to see if it is correct. Prepare but don't yet ask for my insurance payer name."
 
             elif not search_memory('insurance payer name'):
                 human_input += "Ask for my insurance payer name, repeating it back to me as a question to see if it is correct. Prepare but don't yet ask for my insurance payer ID"
@@ -83,15 +83,16 @@ class CustomAgent(LLMAgent):
                 human_input += "Ask for and confirm my medical condition, repeating it back to me as a question to see if it is correct. Prepare but don't yet ask whether I have a referral"
 
             elif not search_memory('referral status'):
-                human_input += "Ask for whether I have a referral. If I say no, confirm that I do not have a referral, and then say 'ok, your referral status is confirmed'. If I do have a referral, ask from who, and confirm who I have a referral from. Then, say 'ok, your referral status is confirmed'. Prepare but don't yet ask whether I have an appointment selection."
+                human_input += " Ask for and confirm whether I have a referral and to whom this referral is for, repeating it back to me as a question to see if it is correct. If I don't have a referral. Then, say 'ok, your referral status is confirmed'. If I do have a referral, say 'ok, your referral status is confirmed'. Prepare but don't yet ask whether I have an appointment selection."
 
             else:
-                human_input += "Ask me whether I want an appointment with with Doctor House on August 1st at 2pm or with Doctor Strange on August 2nd at 3pm, repeating it back to me as a question to see if it is correct. If my response is correct, say 'You are confirmed for an appointment with' the name of Doctor selected and the date and time selected."
+                human_input += " Ask me to choose an appointment preference between an appointment with Doctor House on August 1st at 2pm or with Doctor Strange on Augst 2nd at 3pm. If I have a referral, say the name of my referred Doctor then 'has an appointment on August 10th at 1pm'.' "
 
             self.logger.debug("Creating LLM prompt")
             prompt = self.create_prompt(human_input)
             self.logger.debug("Streaming LLM response")
             sentences = self._stream_sentences(prompt)
+
         response_buffer = ""
         async for sentence in sentences:
             sentence = sentence.replace(f"{self.sender}:", "")

@@ -16,6 +16,8 @@ GOODBYE_PHRASES = [
     "talk to you soon",
     "have a good day",
     "have a good night",
+    "thank you",
+    "thanks",
 ]
 
 class GoodbyeModel:
