@@ -15,14 +15,18 @@ class CustomEventsManager(events_manager.EventsManager):
         super().__init__(subscriptions=[EventType.TRANSCRIPT_COMPLETE,EventType.PHONE_CALL_CONNECTED,EventType.TRANSCRIPT])
 
     def handle_event(self, event: Event):
+
+        # Get Phone call information
         if event.type == EventType.PHONE_CALL_CONNECTED:
             print('------------------------------------------------------')
-            print('to_phone', event.to_phone_number)
+            print('phone call # recieving call:', event.to_phone_number)
             global to_phone
             to_phone = event.to_phone_number
-            print('from_phone', event.from_phone_number)
+            print('recieving call from phone #:', event.from_phone_number)
             global from_phone
             from_phone = event.from_phone_number
+
+        # Handles post conversation i.e. sends message after convo is done and appointment is confirmed
         if event.type == EventType.TRANSCRIPT_COMPLETE:
             print('------------------------------------------------------')
             print('conversation_id', event.conversation_id)
@@ -37,4 +41,4 @@ class CustomEventsManager(events_manager.EventsManager):
                               to = from_phone
                           )
 
-                    print('twilio message',message.sid)
+                    print('twilio message send id: ',message.sid)

@@ -6,17 +6,20 @@ from pyngrok import ngrok
 from vocode.streaming.telephony.config_manager.redis_config_manager import (
     RedisConfigManager,
 )
-from vocode.streaming.models.agent import ChatGPTAgentConfig
+from vocode.streaming.models.agent import ChatGPTAgentConfig, InformationRetrievalAgentConfig, LLMAgentConfig
 from vocode.streaming.models.message import BaseMessage
 from vocode.streaming.telephony.server.base import (
     TwilioInboundCallConfig,
     TelephonyServer,
 )
+from vocode.streaming.models.synthesizer import AzureSynthesizerConfig
 from vocode.streaming.models.transcriber import DeepgramTranscriberConfig, PunctuationEndpointingConfig
 
-from speller_agent import SpellerAgentFactory
 import sys
 from event_manager import CustomEventsManager
+from custom_agent import CustomAgentFactory
+from custom_agent import CustomAgentConfig
+
 
 
 
@@ -54,40 +57,40 @@ def read_prompt_from_file(file_path):
         return f.read()
 
 prompts_file_path = os.path.join(os.path.dirname(__file__), 'prompts', 'prompt.txt')
-prompt = read_prompt_from_file(prompts_file_path)
+pre_prompt = read_prompt_from_file(prompts_file_path)
 
-logger.info('TFFF')
-logger.info(os.environ["TWILIO_ACCOUNT_SID"])
-logger.info(os.environ["TWILIO_AUTH_TOKEN"])
 
-#EndpointingConfig.time_cutoff_seconds = 10
 telephony_server = TelephonyServer(
     base_url=BASE_URL,
     config_manager=config_manager,
-    event_manager=CustomEventsManager(),
+    events_manager=CustomEventsManager(),
     inbound_call_configs=[
         TwilioInboundCallConfig(
             url="/inbound_call",
-            agent_config=ChatGPTAgentConfig(
-                initial_message=BaseMessage(text="Hello, you've reached Health HQ. How can I help you today?"),
-                prompt_preamble=prompt,
-                generate_responses=True,
-                temperature=0.1,
+            agent_config=CustomAgentConfig(
+                initial_message=BaseMessage(text="Hello! I am an AI assistant meant to help schedule your appointment here at Health HQ. Please wait until I am done talking before answering. To start, say your first and last name."),
+                prompt_preamble=pre_prompt,
+                temperature=.05,
                 end_conversation_on_goodbye=True,
-                allowed_idle_time_seconds=15,
+                generate_response=False,
+                allowed_idle_time_seconds=30,
                 allow_agent_to_be_cut_off=False,
+                model_name='text-davinci-003'
             ),
             twilio_config=TwilioConfig(
                 account_sid=os.environ["TWILIO_ACCOUNT_SID"],
                 auth_token=os.environ["TWILIO_AUTH_TOKEN"],
                 record=True
             ),
+            synthesizer_config=AzureSynthesizerConfig.from_telephone_output_device(
+                voice_name="en-US-JennyNeural",
+            ),
             transcriber_config=DeepgramTranscriberConfig.from_telephone_input_device(
                 endpointing_config=PunctuationEndpointingConfig()
             ),
         )
     ],
-    agent_factory=SpellerAgentFactory(),
+    agent_factory=CustomAgentFactory(),
     logger=logger,
 )
 

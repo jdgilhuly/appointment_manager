@@ -5,7 +5,7 @@ services:
     ports:
       - 6379:6379
   app:
-    image: vocode-telephony-app
+    image: appointment-manager
     env_file:
       - .env
     ports:
