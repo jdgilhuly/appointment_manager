@@ -15,7 +15,13 @@ Also download docker and spin it up.
 
 ## To Run
 
-After installing pre-reqs and assuming you have docker (if not, download docker and spin it up), in one terminal init ngrok via:
+Follow these pre-req steps: https://docs.vocode.dev/telephony including:
+
+```cp .env.template .env```
+and setting all the base variables needed.
+
+
+After installing pre-reqs/setting up environmental variables and assuming you have docker (if not, download docker and spin it up), in one terminal init ngrok via:
 
 ```bash
 ngrok http 3000
