@@ -19,11 +19,6 @@ from event_manager import CustomEventsManager
 from custom_agent import CustomAgentFactory
 from custom_agent import CustomAgentConfig
 
-# if running from python, this will load the local .env
-# docker-compose will load the .env file by itself
-from dotenv import load_dotenv
-
-load_dotenv()
 
 app = FastAPI(docs_url=None)
 

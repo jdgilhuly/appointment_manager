@@ -1,4 +1,5 @@
-# Appointment Manager Both
+# Appointment Manager Bot
+
 
 ## Pre-reqs
 
