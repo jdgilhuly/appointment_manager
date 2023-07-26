@@ -6,7 +6,6 @@ from pyngrok import ngrok
 from vocode.streaming.telephony.config_manager.redis_config_manager import (
     RedisConfigManager,
 )
-from vocode.streaming.models.agent import ChatGPTAgentConfig, InformationRetrievalAgentConfig, LLMAgentConfig
 from vocode.streaming.models.message import BaseMessage
 from vocode.streaming.telephony.server.base import (
     TwilioInboundCallConfig,
@@ -19,9 +18,6 @@ import sys
 from event_manager import CustomEventsManager
 from custom_agent import CustomAgentFactory
 from custom_agent import CustomAgentConfig
-
-
-
 
 # if running from python, this will load the local .env
 # docker-compose will load the .env file by itself

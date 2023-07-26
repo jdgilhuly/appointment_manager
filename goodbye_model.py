@@ -18,7 +18,6 @@ GOODBYE_PHRASES = [
     "have a good night",
 ]
 
-
 class GoodbyeModel:
     def __init__(
         self,
@@ -27,12 +26,15 @@ class GoodbyeModel:
         ),
         openai_api_key: Optional[str] = None,
     ):
-        openai.api_key = openai_api_key or getenv("OPENAI_API_KEY")
-        if not openai.api_key:
-            raise ValueError("OPENAI_API_KEY must be set in environment or passed in")
+        self.configure_openai(openai_api_key)
         self.goodbye_embeddings = self.load_or_create_embeddings(
             f"{embeddings_cache_path}/goodbye_embeddings.npy"
         )
+
+    def configure_openai(self, api_key):
+        openai.api_key = api_key or getenv("OPENAI_API_KEY")
+        if not openai.api_key:
+            raise ValueError("OPENAI_API_KEY must be set in environment or passed in")
 
     def load_or_create_embeddings(self, path):
         if os.path.exists(path):
@@ -65,7 +67,6 @@ class GoodbyeModel:
                 )
             )["data"][0]["embedding"]
         )
-
 
 if __name__ == "__main__":
     from dotenv import load_dotenv

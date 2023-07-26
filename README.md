@@ -1,23 +1,29 @@
-# assort_health_takehome
+# Appointment Manager Both
+
+## Pre-reqs
+
+Assuming you have homebrew:
 
 ```bash
-
 brew install python@3.9
 brew install ngrok/ngrok/ngrok
 brew install ffmpeg
 brew install redis
+```
 
-docker build -t vocode-telephony-app .
-docker-compose up
+Also download docker and spin it up.
 
+## To Run
 
-pip3 install pipenv
-pipenv --python 3.9
-pipenv install --dev
-pipenv run python3 main.py
+After installing pre-reqs and assuming you have docker (if not, download docker and spin it up), in one terminal init ngrok via:
 
-
+```bash
 ngrok http 3000
+```
+
+and in the other terminal run:
+
+```bash
 docker build -t appointment-manager .
 docker-compose up
 ```

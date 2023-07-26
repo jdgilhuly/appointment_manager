@@ -1,11 +1,11 @@
 import logging
 import re
 import openai
-from typing import Optional, Tuple, AsyncGenerator, Union
+from typing import Optional, AsyncGenerator
 import typing
-from vocode.streaming.agent import ChatGPTAgent, LLMAgent
-from vocode.streaming.models.agent import AgentConfig, AgentType, ChatGPTAgentConfig, LLMAgentConfig
-from vocode.streaming.agent.base_agent import BaseAgent, RespondAgent
+from vocode.streaming.agent import LLMAgent
+from vocode.streaming.models.agent import AgentConfig, LLMAgentConfig
+from vocode.streaming.agent.base_agent import BaseAgent
 from vocode.streaming.agent.factory import AgentFactory
 
 
@@ -37,7 +37,7 @@ class CustomAgent(LLMAgent):
     ) -> AsyncGenerator[str, None]:
         self.logger.debug("LLM generating response to human input")
 
-        #searches through conversation memory.
+        #searches through conversation memory, if phrase is found, returns true, else returns false
         def search_memory(phrase: str) -> bool:
             if phrase in self.patient_info and self.patient_info[phrase] is not None:
                 return True
@@ -47,6 +47,8 @@ class CustomAgent(LLMAgent):
                 if full_phrase in sentence:
                     self.patient_info[phrase]=True
                     return True
+
+            return False
 
         if is_interrupt and self.agent_config.cut_off_response:
             cut_off_response = self.get_cut_off_response()
@@ -63,7 +65,7 @@ class CustomAgent(LLMAgent):
                 human_input += "Ask for my name, repeating it back to me as a question to see if it is correct. Prepare but don't yet ask for my date of birth"
 
             elif not search_memory('date of birth'):
-                human_input += "Ask for my date of birth, repeating it back to me as a question to see if it is correct. Ask for it in the form of MM/DD/YYYY. Prepare but don't yet ask for my insurance payer name."
+                human_input += "Ask for my date of birth, repeating it back to me as a question to see if it is correct. Prepare but don't yet ask for my insurance payer name."
 
             elif not search_memory('insurance payer name'):
                 human_input += "Ask for my insurance payer name, repeating it back to me as a question to see if it is correct. Prepare but don't yet ask for my insurance payer ID"
