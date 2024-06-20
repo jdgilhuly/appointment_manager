@@ -1,5 +1,6 @@
 # Appointment Manager Bot
 
+This bot utilizes LLM's (your choice) along with vocode and twillio to create a bot capable of creating an appointment booking for a doctor
 
 ## Pre-reqs
 
